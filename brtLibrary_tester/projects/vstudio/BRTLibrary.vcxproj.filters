@@ -178,4 +178,9 @@
       <Filter>include\third_party_libraries\libmysofa\include</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\BRTLibrary\include\ServiceModules\HRTFTester.hpp">
+      <Filter>include\ServiceModules</Filter>
+    </ClCompile>
+  </ItemGroup>
 </Project>
