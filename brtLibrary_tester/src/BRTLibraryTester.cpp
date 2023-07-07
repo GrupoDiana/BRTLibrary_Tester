@@ -92,29 +92,17 @@ int main()
     /////////////////////
     
     brtManager.BeginSetup();
-        source1 = brtManager.CreateSoundSource<BRTSourceModel::CSourceSimpleModel>("speech");      // Instatiate a BRT Sound Source
-        listener->ConnectSoundSource(source1);                                                     // Connecto Source to the listener
+        source1BRT = brtManager.CreateSoundSource<BRTSourceModel::CSourceSimpleModel>("speech");      // Instatiate a BRT Sound Source
+        listener->ConnectSoundSource(source1BRT);                                                     // Connecto Source to the listener
     brtManager.EndSetup();
-    LoadWav(samplesVectorSpeech, SOURCE1_FILEPATH);											 // Loading .wav file
-    
-    
+    LoadWav(samplesVectorSource1, SOURCE1_FILEPATH);											 // Loading .wav file        
     source1Azimuth      = SOURCE1_INITIAL_AZIMUTH;
     source1Elevation    = SOURCE1_INITIAL_ELEVATION;
     source1Distance     = SOURCE1_INITIAL_DISTANCE;
     Common::CTransform sourceSpeechPosition = Common::CTransform();   
     sourceSpeechPosition.SetPosition(Spherical2Cartesians(source1Azimuth, source1Elevation, SOURCE1_INITIAL_DISTANCE));
-    source1->SetSourceTransform(sourceSpeechPosition);
-            
-    //// Steps source setup
-    //brtManager.BeginSetup();
-    //    sourceSteps = brtManager.CreateSoundSource<BRTSourceModel::CSourceSimpleModel>("steps");      // Instatiate a BRT Sound Source
-    //    listener->ConnectSoundSource(sourceSteps);                                                     // Connecto Source to the listener
-    //brtManager.EndSetup();    
-    //LoadWav(samplesVectorSteps, SOURCE2_FILEPATH);											   // Loading .wav file
-    //Common::CTransform sourceStepsPosition = Common::CTransform();
-    //sourceStepsPosition.SetPosition(Common::CVector3(-3, 10, -10));						 // Setting source in (-3,10,-10)
-    //sourceSteps->SetSourceTransform(sourceStepsPosition);        
-    //sourcePosition = sourceStepsPosition;												 // Saving initial position into source position to move the steps audio source later on
+    source1BRT->SetSourceTransform(sourceSpeechPosition);
+                
 
 
     // Declaration and initialization of stereo buffer
@@ -259,13 +247,12 @@ static int rtAudioCallback(void *outputBuffer, void *inputBuffer, unsigned int u
 void audioProcess(Common::CEarPair<CMonoBuffer<float>> & bufferOutput, int uiBufferSize)
 {
     // Declaration, initialization and filling mono buffers
-    CMonoBuffer<float> speechInput(uiBufferSize);	FillBuffer(speechInput, wavSamplePositionSpeech, positionEndFrameSpeech, samplesVectorSpeech);
-    CMonoBuffer<float> stepsInput (uiBufferSize);	FillBuffer(stepsInput,  wavSamplePositionSteps,  positionEndFrameSteps,  samplesVectorSteps );
+    CMonoBuffer<float> source1Input(uiBufferSize);	FillBuffer(source1Input, wavSamplePositionSource1, positionEndFrameSpeech, samplesVectorSource1);    
     
     // Declaration of stereo buffer
     Common::CEarPair<CMonoBuffer<float>> bufferProcessed;
     
-    source1->SetBuffer(speechInput);           // Set samples in the sound source
+    source1BRT->SetBuffer(source1Input);           // Set samples in the sound source
     //sourceSteps->SetBuffer(stepsInput);             // Set samples in the sound source        
     brtManager.ProcessAll();                        // Process all	      
     listener->GetBuffers(bufferProcessed.left, bufferProcessed.right);          // Get out buffers
@@ -383,9 +370,9 @@ void MoveSource_CircularHorizontalPath() {
     if (source1Azimuth > 360) source1Azimuth = 0;
     newPosition = Spherical2Cartesians(source1Azimuth, source1Elevation, source1Distance);
     
-    Common::CTransform sourcePosition = source1->GetCurrentSourceTransform();
+    Common::CTransform sourcePosition = source1BRT->GetCurrentSourceTransform();
     sourcePosition.SetPosition(newPosition);
-    source1->SetSourceTransform(sourcePosition);
+    source1BRT->SetSourceTransform(sourcePosition);
 }
 
 Common::CVector3 Spherical2Cartesians(float azimuth, float elevation, float radius) {

@@ -48,7 +48,7 @@ std::shared_ptr<RtAudio>						audio;												 // Pointer to RtAudio API
 Common::CGlobalParameters globalParameters;                                                     // Class where the global BRT parameters are defined.
 BRTBase::CBRTManager brtManager;                                                                // BRT global manager interface
 std::shared_ptr<BRTListenerModel::CListenerHRTFbasedModel> listener;                            // Pointer to listener model
-std::shared_ptr<BRTSourceModel::CSourceSimpleModel> source1;                               // Pointers to each audio source model
+std::shared_ptr<BRTSourceModel::CSourceSimpleModel> source1BRT;                               // Pointers to each audio source model
 //std::shared_ptr<BRTSourceModel::CSourceSimpleModel> sourceSteps;                                // Pointers to each audio source model
 
 BRTReaders::CSOFAReader sofaReader;                                                             // SOFA reader provide by BRT Library
@@ -63,10 +63,10 @@ float source1Elevation;
 float source1Distance;
 
 Common::CEarPair<CMonoBuffer<float>>	outputBufferStereo;									 // Stereo buffer containing processed audio
-std::vector<float>						samplesVectorSpeech;			                     // Storages the audio from the wav files
-std::vector<float>						samplesVectorSteps;			                        // Storages the audio from the wav files
+std::vector<float>						samplesVectorSource1;			                     // Storages the audio from the wav files
+//std::vector<float>						samplesVectorSteps;			                        // Storages the audio from the wav files
 
-unsigned int							wavSamplePositionSpeech, positionEndFrameSpeech,	 // Storages, respectively, the starting and ending position of the frame being rendered for each source
+unsigned int							wavSamplePositionSource1, positionEndFrameSpeech,	 // Storages, respectively, the starting and ending position of the frame being rendered for each source
                                         wavSamplePositionSteps,  positionEndFrameSteps ;
 
 
