@@ -239,7 +239,8 @@ static int rtAudioCallback(void *outputBuffer, void *inputBuffer, unsigned int u
     }
         
     // Moving the source
-    MoveSource_CircularHorizontalPath();
+    MoveSource_CircularPathTransversePlane();
+    //MoveSource_CircularPathSagittalPlane();  // TODO Check if it is working well
   
     return 0;
 }
@@ -363,7 +364,7 @@ bool LoadILD( std::string _ildFilePath) {
 ///////////////////////
 // SOURCE MOVEMENT
 ///////////////////////
-void MoveSource_CircularHorizontalPath() {
+void MoveSource_CircularPathTransversePlane() {
     
     Common::CVector3 newPosition;
     source1Azimuth += SOURCE1_INITIAL_SPEED;
@@ -375,21 +376,40 @@ void MoveSource_CircularHorizontalPath() {
     source1BRT->SetSourceTransform(sourcePosition);
 }
 
+void MoveSource_CircularPathSagittalPlane() {
+
+    Common::CVector3 newPosition;
+    source1Elevation += SOURCE1_INITIAL_SPEED;
+    if (source1Elevation > 360) source1Elevation = 0;
+    if (source1Elevation > 90 && source1Elevation < 270) source1Elevation = 270;
+
+    newPosition = Spherical2Cartesians(source1Azimuth, source1Elevation, source1Distance);
+
+    Common::CTransform sourcePosition = source1BRT->GetCurrentSourceTransform();
+    sourcePosition.SetPosition(newPosition);
+    source1BRT->SetSourceTransform(sourcePosition);
+}
+
 Common::CVector3 Spherical2Cartesians(float azimuth, float elevation, float radius) {
     
-    float x = radius * cos(azimuth) * cos (elevation);
-    float y = radius * sin(azimuth) * cos (elevation);
-    float z = radius * sin(elevation);
+    
+
+    float x = radius * std::cos(d2r(azimuth)) * std::cos (d2r(elevation));
+    float y = radius * std::sin(d2r(azimuth)) * std::cos (d2r(elevation));
+    float z = radius * std::sin(d2r(elevation));
 
     Common::CVector3 pos = listener->GetListenerTransform().GetPosition();
 
     pos.x = pos.x + x;
     pos.y = pos.y + y;
-    pos.z = 0.0f;
+    pos.z = pos.z + z;
 
     return pos;
 }
 
+double d2r(double d) {
+    return (d / 180.0) * ((double)M_PI);
+}
 
 ///////////////////////
 // TEST HRTF

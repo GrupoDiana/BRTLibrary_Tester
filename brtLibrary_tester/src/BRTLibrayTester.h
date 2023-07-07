@@ -35,7 +35,7 @@
 #define SOURCE1_INITIAL_AZIMUTH     0
 #define SOURCE1_INITIAL_ELEVATION   0
 #define SOURCE1_INITIAL_DISTANCE    2
-#define SOURCE1_INITIAL_SPEED       0.001           
+#define SOURCE1_INITIAL_SPEED       0.1           
 
 #include <cstdio>
 #include <cstring>
@@ -113,8 +113,13 @@ bool LoadSofaFile(std::string _filePath);
 
 bool LoadILD(std::string _ildFilePath);
 
-void MoveSource_CircularHorizontalPath();
+void MoveSource_CircularPathTransversePlane();
+
+void MoveSource_CircularPathSagittalPlane();
+
 Common::CVector3 Spherical2Cartesians(float azimuth, float elevation, float radius);
+
+double d2r(double d);
 
 void TestGrid(std::shared_ptr<BRTServices::CHRTF> _hrtf);
 
