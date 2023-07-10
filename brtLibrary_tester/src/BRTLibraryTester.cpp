@@ -65,7 +65,7 @@ int main()
 
     // Load HRTFs from SOFA files            
     bool hrtfSofaLoaded1 = LoadSofaFile(SOFA1_FILEPATH);
-    bool hrtfSofaLoaded2 = LoadSofaFile(SOFA2_FILEPATH);
+    //bool hrtfSofaLoaded2 = LoadSofaFile(SOFA2_FILEPATH);
     // Set one for the listener. We can change it at runtime    
     if (hrtfSofaLoaded1) {
         listener->SetHRTF(HRTF_list[0]);
@@ -82,7 +82,7 @@ int main()
     //////////////////////////////
     // TESTING HRTFs
     ///////////////////////////////
-    TestGrid(HRTF_list[0]);
+    TestGrid(SOFA1_FILEPATH);
 
 
 
@@ -374,20 +374,35 @@ void MoveSource_CircularPathTransversePlane() {
     Common::CTransform sourcePosition = source1BRT->GetCurrentSourceTransform();
     sourcePosition.SetPosition(newPosition);
     source1BRT->SetSourceTransform(sourcePosition);
+    std::cout << "azimuth " << source1Azimuth << " elevation " << source1Elevation << std::endl;
 }
 
 void MoveSource_CircularPathSagittalPlane() {
 
     Common::CVector3 newPosition;
-    source1Elevation += SOURCE1_INITIAL_SPEED;
-    if (source1Elevation > 360) source1Elevation = 0;
-    if (source1Elevation > 90 && source1Elevation < 270) source1Elevation = 270;
-
+    
+    if (source1Azimuth == 0) {
+        source1Elevation += SOURCE1_INITIAL_SPEED;
+        if (source1Elevation > 90) {
+            source1Azimuth = 180;
+            source1Elevation = 90;
+        }
+    }
+    else if (source1Azimuth == 180) {
+        source1Elevation -= SOURCE1_INITIAL_SPEED;
+        if (source1Elevation < -90) {
+            source1Azimuth = 0;
+            source1Elevation = -90;
+        }
+    }
+        
     newPosition = Spherical2Cartesians(source1Azimuth, source1Elevation, source1Distance);
 
     Common::CTransform sourcePosition = source1BRT->GetCurrentSourceTransform();
     sourcePosition.SetPosition(newPosition);
     source1BRT->SetSourceTransform(sourcePosition);
+
+    std::cout << "azimuth " << source1Azimuth << " elevation " << source1Elevation << std::endl;
 }
 
 Common::CVector3 Spherical2Cartesians(float azimuth, float elevation, float radius) {
@@ -415,10 +430,17 @@ double d2r(double d) {
 // TEST HRTF
 ///////////////////////
 
-void TestGrid(std::shared_ptr<BRTServices::CHRTF> _hrtf) {
-    // DO WHATEVER
-    hrtfTester.TestGrid(_hrtf);
+void TestGrid(std::string _filePath) {
     
+    std::shared_ptr<BRTServices::CHRTF> hrtf = std::make_shared<BRTServices::CHRTF>();
+    
+    bool result = sofaReader.ReadHRTFFromSofaWithoutProcess(_filePath, hrtf, HRTFRESAMPLINGSTEP);
+    if (result) {
+        // DO WHATEVER
+        std::vector<orientation> listOfOrientations;
+        listOfOrientations = hrtfTester.TestGrid(hrtf);
 
+        std::cout << listOfOrientations.size();
 
+    }        
 }
