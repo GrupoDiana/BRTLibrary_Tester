@@ -121,6 +121,6 @@ Common::CVector3 Spherical2Cartesians(float azimuth, float elevation, float radi
 
 double d2r(double d);
 
-void TestGrid(std::shared_ptr<BRTServices::CHRTF> _hrtf);
+void TestGrid(std::string _filePath);
 
 #endif
