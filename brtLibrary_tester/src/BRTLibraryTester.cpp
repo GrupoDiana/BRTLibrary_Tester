@@ -82,9 +82,9 @@ int main()
     //////////////////////////////
     // TESTING HRTFs
     ///////////////////////////////
-    TestGrid(SOFA1_FILEPATH);
+    //TestGrid(SOFA2_FILEPATH);
 
-
+    TestGrid(SOFA3_FILEPATH);
 
          
     /////////////////////
@@ -441,6 +441,9 @@ void TestGrid(std::string _filePath) {
         listOfOrientations = hrtfTester.TestGrid(hrtf);
 
         std::cout << listOfOrientations.size();
+
+
+        hrtfTester.TestGridInterpolation(hrtf);
 
     }        
 }

@@ -24,7 +24,8 @@
 
 #define SAMPLERATE 44100
 #define SOFA1_FILEPATH "../../resources/hrtf.sofa"
-#define SOFA2_FILEPATH "../../resources/hrtf.sofa"
+#define SOFA2_FILEPATH "../../resources/0_IRC_1008_R_HRIR.sofa"
+#define SOFA3_FILEPATH "../../resources/ListenResamp15.sofa"
 #define SOURCE1_FILEPATH "../../resources/speech.wav"
 #define SOURCE2_FILEPATH "../../resources/steps.wav"
 #define HRTFRESAMPLINGSTEP 15
