@@ -64,7 +64,7 @@ int main()
 
 
     // Load HRTFs from SOFA files            
-    bool hrtfSofaLoaded1 = LoadSofaFile(SOFA1_FILEPATH);
+    bool hrtfSofaLoaded1 = LoadSofaFile(SOFA4_FILEPATH);
     //bool hrtfSofaLoaded2 = LoadSofaFile(SOFA2_FILEPATH);
     // Set one for the listener. We can change it at runtime    
     if (hrtfSofaLoaded1) {
@@ -114,6 +114,8 @@ int main()
 
     // Starting the stream
     audio->startStream();
+
+    // I wanna call again the AudioSetup and start making the other trajectory 
 
     // Informing user by the console to press any key to end the execution
     std::cout << "Press ENTER to finish... \n";

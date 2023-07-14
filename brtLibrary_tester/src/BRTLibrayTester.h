@@ -22,13 +22,14 @@
 #ifndef _BASICSPATIALISATIONRTAUDIO_H_
 #define _BASICSPATIALISATIONRTAUDIO_H_
 
-#define SAMPLERATE 44100
+#define SAMPLERATE 48000
 #define SOFA1_FILEPATH "../../resources/hrtf.sofa"
 #define SOFA2_FILEPATH "../../resources/0_IRC_1008_R_HRIR.sofa"
 #define SOFA3_FILEPATH "../../resources/ListenResamp15.sofa"
+#define SOFA4_FILEPATH "../../resources/SOFATransparentFront.sofa"
 #define SOURCE1_FILEPATH "../../resources/speech.wav"
 #define SOURCE2_FILEPATH "../../resources/steps.wav"
-#define HRTFRESAMPLINGSTEP 15
+#define HRTFRESAMPLINGSTEP 2
 #define ILD_NearFieldEffect_44100 "../../resources/NearFieldCompensation_ILD_44100.sofa"
 #define ILD_NearFieldEffect_48000 "../../resources/NearFieldCompensation_ILD_48000.sofa"
 #define ILD_NearFieldEffect_96000 "../../resources/NearFieldCompensation_ILD_96000.sofa"
@@ -36,7 +37,8 @@
 #define SOURCE1_INITIAL_AZIMUTH     0
 #define SOURCE1_INITIAL_ELEVATION   0
 #define SOURCE1_INITIAL_DISTANCE    2
-#define SOURCE1_INITIAL_SPEED       0.1           
+#define SOURCE1_INITIAL_SPEED       0.05
+
 
 #include <cstdio>
 #include <cstring>
