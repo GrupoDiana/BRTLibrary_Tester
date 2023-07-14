@@ -433,17 +433,44 @@ double d2r(double d) {
 void TestGrid(std::string _filePath) {
     
     std::shared_ptr<BRTServices::CHRTF> hrtf = std::make_shared<BRTServices::CHRTF>();
-    
+
+    char answer;
+
     bool result = sofaReader.ReadHRTFFromSofaWithoutProcess(_filePath, hrtf, HRTFRESAMPLINGSTEP);
     if (result) {
-        // DO WHATEVER
-        std::vector<orientation> listOfOrientations;
-        listOfOrientations = hrtfTester.TestGrid(hrtf);
 
-        std::cout << listOfOrientations.size();
+        std::cout << "Start Test Processing\n";
+
+        // Ask the user if want to make the Grid Test.
+        do {
+            std::cout << "Do you want to make the Test of Grid and save into a .csv file? Y/N\n";
+            std::cin >> answer;
+            std::cin.clear();
+            std::cin.ignore(INT_MAX, '\n');
+        } while (!(answer == 'Y' || answer == 'y'|| answer == 'N' || answer == 'n'));
+
+        if (answer == 'Y' || answer == 'y')
+        {
+            // Call to the method Test Grid that prints to a .csv file the Grid created
+            hrtfTester.TestGrid(hrtf);
+            answer == '0';
+        }
 
 
-        hrtfTester.TestGridInterpolation(hrtf);
+        do {
+            std::cout << "Do you want to make the Test of Grid Interpolation to check how many interpolations need a SOFA already interpoated? Y/N\n";
+            std::cin >> answer;
+            std::cin.clear();
+            std::cin.ignore(INT_MAX, '\n');
+        } while (!(answer == 'Y' || answer == 'y' || answer == 'N' || answer == 'n'));
+
+        if (answer == 'Y' || answer == 'y')
+        {
+            // Call to the method Test Grid Interpolation that prints to console the number of HRIRs interpolated to check if a SOFA already interpolated needs to be interpolate. 
+            hrtfTester.TestGridInterpolation(hrtf);
+            answer == '0';
+        }
+
 
     }        
 }
