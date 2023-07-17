@@ -27,9 +27,9 @@
 #define SOFA2_FILEPATH "../../resources/0_IRC_1008_R_HRIR.sofa"
 #define SOFA3_FILEPATH "../../resources/ListenResamp15.sofa"
 #define SOFA4_FILEPATH "../../resources/SOFATransparentFront.sofa"
-#define SOURCE1_FILEPATH "../../resources/speech.wav"
+#define SOURCE1_FILEPATH "../../resources/WhiteNoise.wav"
 #define SOURCE2_FILEPATH "../../resources/steps.wav"
-#define HRTFRESAMPLINGSTEP 2
+#define HRTFRESAMPLINGSTEP 10
 #define ILD_NearFieldEffect_44100 "../../resources/NearFieldCompensation_ILD_44100.sofa"
 #define ILD_NearFieldEffect_48000 "../../resources/NearFieldCompensation_ILD_48000.sofa"
 #define ILD_NearFieldEffect_96000 "../../resources/NearFieldCompensation_ILD_96000.sofa"
