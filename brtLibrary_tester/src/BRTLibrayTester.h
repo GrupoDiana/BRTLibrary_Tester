@@ -28,7 +28,7 @@
 #define SOFA3_FILEPATH "../../resources/ListenResamp15.sofa"
 #define SOFA4_FILEPATH "../../resources/SOFATransparentFront.sofa"
 #define SOURCE1_FILEPATH "../../resources/WhiteNoise.wav"
-#define SOURCE2_FILEPATH "../../resources/steps.wav"
+#define SOURCE2_FILEPATH "../../resources/speech.wav"
 #define HRTFRESAMPLINGSTEP 10
 #define ILD_NearFieldEffect_44100 "../../resources/NearFieldCompensation_ILD_44100.sofa"
 #define ILD_NearFieldEffect_48000 "../../resources/NearFieldCompensation_ILD_48000.sofa"
@@ -37,7 +37,7 @@
 #define SOURCE1_INITIAL_AZIMUTH     0
 #define SOURCE1_INITIAL_ELEVATION   0
 #define SOURCE1_INITIAL_DISTANCE    2
-#define SOURCE1_INITIAL_SPEED       0.05
+#define SOURCE1_INITIAL_SPEED       0.1
 
 
 #include <cstdio>
@@ -71,6 +71,8 @@ std::vector<float>						samplesVectorSource1;			                     // Storages
 
 unsigned int							wavSamplePositionSource1, positionEndFrameSpeech,	 // Storages, respectively, the starting and ending position of the frame being rendered for each source
                                         wavSamplePositionSteps,  positionEndFrameSteps ;
+
+unsigned int                            loopCounter = 0;
 
 
 
@@ -116,14 +118,18 @@ bool LoadSofaFile(std::string _filePath);
 
 bool LoadILD(std::string _ildFilePath);
 
-void MoveSource_CircularPathTransversePlane();
+void MoveSource();
 
-void MoveSource_CircularPathSagittalPlane();
+void MoveSource_CircularPathTransversePlane(unsigned int& loopCounter);
+
+void MoveSource_CircularPathSagittalPlane(unsigned int& loopCounter);
 
 Common::CVector3 Spherical2Cartesians(float azimuth, float elevation, float radius);
 
 double d2r(double d);
 
 void TestGrid(std::string _filePath);
+
+void TestOnlineInterpolation();
 
 #endif

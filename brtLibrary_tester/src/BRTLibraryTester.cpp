@@ -241,7 +241,8 @@ static int rtAudioCallback(void *outputBuffer, void *inputBuffer, unsigned int u
     }
         
     // Moving the source
-    MoveSource_CircularPathTransversePlane();
+    MoveSource();
+    //MoveSource_CircularPathTransversePlane();
     //MoveSource_CircularPathSagittalPlane();  // TODO Check if it is working well
   
     return 0;
@@ -366,11 +367,25 @@ bool LoadILD( std::string _ildFilePath) {
 ///////////////////////
 // SOURCE MOVEMENT
 ///////////////////////
-void MoveSource_CircularPathTransversePlane() {
+
+void MoveSource()
+{
+    if (loopCounter < 2)
+    {
+        MoveSource_CircularPathTransversePlane(loopCounter);
+    }
+    else
+    {
+        MoveSource_CircularPathSagittalPlane(loopCounter);
+        if (loopCounter == 3) { loopCounter = 0; source1Elevation = SOURCE1_INITIAL_ELEVATION; }
+    }
+}
+
+void MoveSource_CircularPathTransversePlane(unsigned int& loopCounter) {
     
     Common::CVector3 newPosition;
     source1Azimuth += SOURCE1_INITIAL_SPEED;
-    if (source1Azimuth > 360) source1Azimuth = 0;
+    if (source1Azimuth > 360) { source1Azimuth = 0; loopCounter++; }
     newPosition = Spherical2Cartesians(source1Azimuth, source1Elevation, source1Distance);
     
     Common::CTransform sourcePosition = source1BRT->GetCurrentSourceTransform();
@@ -379,16 +394,18 @@ void MoveSource_CircularPathTransversePlane() {
     std::cout << "azimuth " << source1Azimuth << " elevation " << source1Elevation << std::endl;
 }
 
-void MoveSource_CircularPathSagittalPlane() {
+void MoveSource_CircularPathSagittalPlane(unsigned int& loopCounter) {
 
     Common::CVector3 newPosition;
     
     if (source1Azimuth == 0) {
-        source1Elevation += SOURCE1_INITIAL_SPEED;
+        source1Elevation += SOURCE1_INITIAL_SPEED;    
         if (source1Elevation > 90) {
             source1Azimuth = 180;
             source1Elevation = 90;
         }
+        if (std::trunc(source1Elevation * 10) / 10 == 0) 
+        { loopCounter++; }
     }
     else if (source1Azimuth == 180) {
         source1Elevation -= SOURCE1_INITIAL_SPEED;
@@ -460,7 +477,7 @@ void TestGrid(std::string _filePath) {
 
 
         do {
-            std::cout << "Do you want to make the Test of Grid Interpolation to check how many interpolations need a SOFA already interpoated? Y/N\n";
+            std::cout << "Do you want to make the Test of Grid Interpolation to check how many interpolations need a SOFA already interpolated? Y/N\n";
             std::cin >> answer;
             std::cin.clear();
             std::cin.ignore(INT_MAX, '\n');
