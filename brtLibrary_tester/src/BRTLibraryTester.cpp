@@ -25,19 +25,12 @@
 #endif
 
 int iBufferSize;
-bool bEnableReverb;
+float resamplingStep = HRTFRESAMPLINGSTEP;
 int main()
 {
     //Input buffer size and reverb enable
     std::cout << "Insert wished buffer size (256, 512, 1024, 2048, 4096...)\n(2048 at least recommended for linux)\t: ";
     std::cin >> iBufferSize; std::cin.ignore();
-
-    /*char cInput;
-    do{  	std::cout << "\nDo you want reverb? (Y/n) : "; cInput=getchar();
-    }while(cInput != 'y' && cInput != 'n' && cInput != '\n');
-
-    if(cInput=='y' || cInput == '\n') bEnableReverb = true;
-    else       */                       bEnableReverb = false;
     
     // Configure BRT Error handler
     BRT_ERRORHANDLER.SetVerbosityMode(VERBOSITYMODE_ERRORSANDWARNINGS);
@@ -50,72 +43,70 @@ int main()
     /////////////////////
     // Listener setup
     /////////////////////
-    brtManager.BeginSetup();
-    listener = brtManager.CreateListener<BRTListenerModel::CListenerHRTFbasedModel>("listener1");
-    brtManager.EndSetup();    
-    Common::CTransform listenerPosition = Common::CTransform();		 // Setting listener in (0,0,0)
-    listenerPosition.SetPosition(Common::CVector3(0, 0, 0));
-    listener->SetListenerTransform(listenerPosition);
+    ListenerSetup();
+
+    LoadHRTF();
+
+    int modeOfTest;
+    do
+    {
+        modeOfTest = MenuTest();
+        switch (modeOfTest)
+        {
+            case 0:
+            // Test Grid creation -- Write.csv
+
+                TestGridCreationMain(SOFA3_FILEPATH);
+                break;
+
+            case 1:
+            // Test Grid Interpolation -- SOFA already interpolated
+
+                TestGridInterpolationOffline_SOFAInterpolated(SOFA3_FILEPATH);
+                break;
+
+            case 2:
+            // Test Interpolation Offline -- Semi-Transparent HRTF
+
+                // Desactivar interpolation online y probar quizá tmbn diferentes resampling step.
+                
+                break;
+
+            case 3:
+            // Test Interpolation Online -- Semi-Transparent HRTF.
+
+                char answer;
+                AudioSetupAndStart();
+                do {
+                    answer = TestOnlineInterpolation();
+                } while (answer != -1);
+
+                // Stopping and closing the stream
+                audio->stopStream();
+                audio->closeStream();
+                break;
+
+            default:
+                break;
+
+                
+        }
+
+    } while (modeOfTest != -1);
+  
+    // Repeat that menu when one test is done
     
-    // We can activate/deactivate different parameters of the listener in the following way
-    //listener->DisableSpatialization();
-    //listener->DisableInterpolation();
-    listener->DisableNearFieldEffect();
-
-
-    // Load HRTFs from SOFA files            
-    bool hrtfSofaLoaded1 = LoadSofaFile(SOFA4_FILEPATH);
-    //bool hrtfSofaLoaded2 = LoadSofaFile(SOFA2_FILEPATH);
-    // Set one for the listener. We can change it at runtime    
-    if (hrtfSofaLoaded1) {
-        listener->SetHRTF(HRTF_list[0]);
-    }
-
-    //// LOAD NEARFIELD ILD coefficients 
-    //bool ildSofaLoaded = LoadILD(ILD_NearFieldEffect_44100);
-    //// Set to the listener
-    //if (ildSofaLoaded) {
-    //    listener->SetILD(ILD_list[0]);
-    //}
-
 
     //////////////////////////////
-    // TESTING HRTFs
-    ///////////////////////////////
-    //TestGrid(SOFA2_FILEPATH);
-
-    TestGrid(SOFA3_FILEPATH);
-
-         
-    /////////////////////
-    // Speech source setup
-    /////////////////////
-    
-    brtManager.BeginSetup();
-        source1BRT = brtManager.CreateSoundSource<BRTSourceModel::CSourceSimpleModel>("speech");      // Instatiate a BRT Sound Source
-        listener->ConnectSoundSource(source1BRT);                                                     // Connecto Source to the listener
-    brtManager.EndSetup();
-    LoadWav(samplesVectorSource1, SOURCE1_FILEPATH);											 // Loading .wav file        
-    source1Azimuth      = SOURCE1_INITIAL_AZIMUTH;
-    source1Elevation    = SOURCE1_INITIAL_ELEVATION;
-    source1Distance     = SOURCE1_INITIAL_DISTANCE;
-    Common::CTransform sourceSpeechPosition = Common::CTransform();   
-    sourceSpeechPosition.SetPosition(Spherical2Cartesians(source1Azimuth, source1Elevation, SOURCE1_INITIAL_DISTANCE));
-    source1BRT->SetSourceTransform(sourceSpeechPosition);
-                
-
-
-    // Declaration and initialization of stereo buffer
-  	outputBufferStereo.left.resize(iBufferSize);
-  	outputBufferStereo.right.resize(iBufferSize);
-
-
-    AudioSetup();
-
-    // Starting the stream
-    audio->startStream();
-
-    // I wanna call again the AudioSetup and start making the other trajectory 
+    // TEST ONLINE INTERPOLATION
+    //////////////////////////////
+    //if (bTestGridInterpolation) { 
+    //    char answer;
+    //    do {
+    //        answer= TestOnlineInterpolation();
+    //    } while (answer != 'x');
+    //        
+    //}
 
     // Informing user by the console to press any key to end the execution
     std::cout << "Press ENTER to finish... \n";
@@ -123,13 +114,91 @@ int main()
     getchar();
 
 
-    // Stopping and closing the stream
-    audio->stopStream();
-    audio->closeStream();
+    //// Stopping and closing the stream
+    //audio->stopStream();
+    //audio->closeStream();
 
 
     return 0;
 }
+
+void LoadHRTF()
+{
+    // Load HRTFs from SOFA files  
+    bool hrtfSofaLoaded1 = LoadSofaFile(SOFA4_FILEPATH);
+    //bool hrtfSofaLoaded2 = LoadSofaFile(SOFA2_FILEPATH);
+    // Set one for the listener. We can change it at runtime    
+    if (hrtfSofaLoaded1) {
+        listener->SetHRTF(HRTF_list[0]);
+    }
+}
+
+void AudioSetupAndStart()
+{
+
+    SourceSetup();
+
+    // Declaration and initialization of stereo buffer
+    outputBufferStereo.left.resize(iBufferSize);
+    outputBufferStereo.right.resize(iBufferSize);
+
+    AudioSetup();
+
+    // Starting the stream
+    audio->startStream();
+}
+
+void ListenerSetup()
+{
+
+    brtManager.BeginSetup();
+    listener = brtManager.CreateListener<BRTListenerModel::CListenerHRTFbasedModel>("listener1");
+    brtManager.EndSetup();
+    Common::CTransform listenerPosition = Common::CTransform();		 // Setting listener in (0,0,0)
+    listenerPosition.SetPosition(Common::CVector3(0, 0, 0));
+    listener->SetListenerTransform(listenerPosition);
+
+    // We can activate/deactivate different parameters of the listener in the following way
+    //listener->DisableSpatialization();
+    listener->DisableNearFieldEffect();
+}
+
+int MenuTest()
+{
+    std::cout << "           Choose which Test do you want to try now:" << std::endl;
+    std::cout << "---------------------------------------------------------------------" << std::endl;
+    std::cout << "0:  Test Creation of the Grid and write orientations to .csv file." << std::endl;
+    std::cout << "1:  Test Grid Interpolation Offline of a SOFA already interpolated." << std::endl;
+    std::cout << "2:  Test Interpolation Offline with a Semi-Transparent HRTF." << std::endl;
+    std::cout << "3:  Test Interpolation Online with a Semi-Transparent HRTF." << std::endl;
+    std::cout << "-1:  Exit Tests." << std::endl;
+
+    //cout << "Please choose which audio output you wish to use: ";
+    //cin >> selectAudioDevice; cin.ignore();	
+    int selectModeTest;
+    do {
+        std::cout << "Please choose which Test do you want to run: ";
+        std::cin >> selectModeTest;
+        std::cin.clear();
+        std::cin.ignore(INT_MAX, '\n');
+    } while (!(selectModeTest == -1 || selectModeTest == 0 || selectModeTest == 1 || selectModeTest == 2 || selectModeTest == 3));
+    return selectModeTest;
+}
+void SourceSetup()
+{
+    brtManager.BeginSetup();
+    source1BRT = brtManager.CreateSoundSource<BRTSourceModel::CSourceSimpleModel>("speech");      // Instatiate a BRT Sound Source
+    listener->ConnectSoundSource(source1BRT);                                                     // Connecto Source to the listener
+    brtManager.EndSetup();
+    LoadWav(samplesVectorSource1, SOURCE1_FILEPATH);											 // Loading .wav file        
+    source1Azimuth = SOURCE1_INITIAL_AZIMUTH;
+    source1Elevation = SOURCE1_INITIAL_ELEVATION;
+    source1Distance = SOURCE1_INITIAL_DISTANCE;
+    Common::CTransform sourceSpeechPosition = Common::CTransform();
+    sourceSpeechPosition.SetPosition(Spherical2Cartesians(source1Azimuth, source1Elevation, SOURCE1_INITIAL_DISTANCE));
+    source1BRT->SetSourceTransform(sourceSpeechPosition);
+}
+
 
 void AudioSetup()
 {
@@ -189,6 +258,7 @@ void AudioSetup()
     //    exit( 0 );
     //}
 }
+
 
 int SelectAudioDevice() {
 
@@ -325,7 +395,7 @@ bool LoadSofaFile(std::string _filePath) {
         std::cout<<"The sample rate in HRTF SOFA file." << std::endl;
         return false;
     }
-    bool result = sofaReader.ReadHRTFFromSofa(_filePath, hrtf, HRTFRESAMPLINGSTEP);
+    bool result = sofaReader.ReadHRTFFromSofa(_filePath, hrtf, resamplingStep);
     if (result) {
         std::cout << ("HRTF Sofa file loaded successfully.") << std::endl;
         HRTF_list.push_back(hrtf);
@@ -391,7 +461,7 @@ void MoveSource_CircularPathTransversePlane(unsigned int& loopCounter) {
     Common::CTransform sourcePosition = source1BRT->GetCurrentSourceTransform();
     sourcePosition.SetPosition(newPosition);
     source1BRT->SetSourceTransform(sourcePosition);
-    std::cout << "azimuth " << source1Azimuth << " elevation " << source1Elevation << std::endl;
+    //std::cout << "azimuth " << source1Azimuth << " elevation " << source1Elevation << std::endl;
 }
 
 void MoveSource_CircularPathSagittalPlane(unsigned int& loopCounter) {
@@ -421,7 +491,7 @@ void MoveSource_CircularPathSagittalPlane(unsigned int& loopCounter) {
     sourcePosition.SetPosition(newPosition);
     source1BRT->SetSourceTransform(sourcePosition);
 
-    std::cout << "azimuth " << source1Azimuth << " elevation " << source1Elevation << std::endl;
+    //std::cout << "azimuth " << source1Azimuth << " elevation " << source1Elevation << std::endl;
 }
 
 Common::CVector3 Spherical2Cartesians(float azimuth, float elevation, float radius) {
@@ -449,47 +519,95 @@ double d2r(double d) {
 // TEST HRTF
 ///////////////////////
 
-void TestGrid(std::string _filePath) {
+void TestGridCreationMain(std::string _filePath) {
     
     std::shared_ptr<BRTServices::CHRTF> hrtf = std::make_shared<BRTServices::CHRTF>();
-
-    char answer;
 
     bool result = sofaReader.ReadHRTFFromSofaWithoutProcess(_filePath, hrtf, HRTFRESAMPLINGSTEP);
     if (result) {
 
         std::cout << "Start Test Processing\n";
 
-        // Ask the user if want to make the Grid Test.
-        do {
-            std::cout << "Do you want to make the Test of Grid and save into a .csv file? Y/N\n";
-            std::cin >> answer;
-            std::cin.clear();
-            std::cin.ignore(INT_MAX, '\n');
-        } while (!(answer == 'Y' || answer == 'y'|| answer == 'N' || answer == 'n'));
-
-        if (answer == 'Y' || answer == 'y')
-        {
-            // Call to the method Test Grid that prints to a .csv file the Grid created
-            hrtfTester.TestGrid(hrtf);
-            answer == '0';
-        }
-
-
-        do {
-            std::cout << "Do you want to make the Test of Grid Interpolation to check how many interpolations need a SOFA already interpolated? Y/N\n";
-            std::cin >> answer;
-            std::cin.clear();
-            std::cin.ignore(INT_MAX, '\n');
-        } while (!(answer == 'Y' || answer == 'y' || answer == 'N' || answer == 'n'));
-
-        if (answer == 'Y' || answer == 'y')
-        {
-            // Call to the method Test Grid Interpolation that prints to console the number of HRIRs interpolated to check if a SOFA already interpolated needs to be interpolate. 
-            hrtfTester.TestGridInterpolation(hrtf);
-            answer == '0';
-        }
-
+        // Call to the method Test Grid that prints to a .csv file the Grid created
+        hrtfTester.TestGridCreation(hrtf);
 
     }        
+}
+
+void TestGridInterpolationOffline_SOFAInterpolated(std::string _filePath)
+{
+    std::shared_ptr<BRTServices::CHRTF> hrtf = std::make_shared<BRTServices::CHRTF>();
+
+    bool result = sofaReader.ReadHRTFFromSofaWithoutProcess(_filePath, hrtf, HRTFRESAMPLINGSTEP);
+
+    if (result) {
+
+        std::cout << "Start Test Grid Interpolaiton Online Processing\n";
+
+        // Call to the method Test Grid Interpolation that prints to console the number of HRIRs interpolated to check if a SOFA already interpolated needs to be interpolate. 
+        hrtfTester.TestGridInterpolation(hrtf);
+    }
+
+}
+
+//////////////////////////////
+// TEST ONLINE INTERPOLATION
+//////////////////////////////
+
+int TestOnlineInterpolation()
+{
+    int answer;
+    // Able to switch between Interpolation Online ON/OFF     
+    do {
+        std::cout << "Choose which option do you want to do:  " << std::endl;
+        std::cout << "0: Press 0 if you want to Disabled Online Interpolation." << std::endl;
+        std::cout << "1: Press 1 if you want to Activate Online Interpolation." << std::endl;
+        std::cout << "2: Press 2 if you want to change HRTF Resampling Step." << std::endl;
+        std::cout << "-1: Exit" << std::endl;
+
+        std::cin >> answer;
+        std::cin.clear();
+        std::cin.ignore(INT_MAX, '\n');
+    } while (!(answer == 0 || answer == 1 || answer == 2 || answer == -1));
+
+    if (answer == 0)
+    {
+        listener->DisableInterpolation();
+        std::cout << "Interpolation Online Disabled" << std::endl;
+        answer == '0';
+    }
+    else if (answer == 1)
+    {
+        listener->EnableInterpolation();
+        std::cout << "Interpolation Online Enabled" << std::endl;
+        answer == '0';
+    }else if (answer == 2)
+    {
+        audio->stopStream();
+
+        ChangeResamplingStep();
+        
+        audio->startStream();
+
+    }
+    return answer;
+}
+
+void ChangeResamplingStep()
+{
+    float _resamplingStep;
+
+    do {
+        std::cout << "Enter the desired Resampling Step: ";
+
+        std::cin >> _resamplingStep;
+        std::cin.clear();
+        std::cin.ignore(INT_MAX, '\n');
+    } while (!(_resamplingStep > 0));
+
+    resamplingStep = _resamplingStep;
+    std::cout << "Resampling Step sets to: " << resamplingStep << std::endl;
+
+    LoadHRTF();
+
 }

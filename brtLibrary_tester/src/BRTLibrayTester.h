@@ -29,7 +29,7 @@
 #define SOFA4_FILEPATH "../../resources/SOFATransparentFront.sofa"
 #define SOURCE1_FILEPATH "../../resources/WhiteNoise.wav"
 #define SOURCE2_FILEPATH "../../resources/speech.wav"
-#define HRTFRESAMPLINGSTEP 10
+#define HRTFRESAMPLINGSTEP 20
 #define ILD_NearFieldEffect_44100 "../../resources/NearFieldCompensation_ILD_44100.sofa"
 #define ILD_NearFieldEffect_48000 "../../resources/NearFieldCompensation_ILD_48000.sofa"
 #define ILD_NearFieldEffect_96000 "../../resources/NearFieldCompensation_ILD_96000.sofa"
@@ -89,6 +89,14 @@ int SelectAudioDevice();
 
 void AudioSetup();
 
+void SourceSetup();
+
+void ListenerSetup();
+
+void AudioSetupAndStart();
+
+void LoadHRTF();
+
 /** \brief Fills a buffer with the correct audio frame from the input float vector
 *	\param [out] output output buffer
 *	\param [in,out] position starting position of the frame to be processed
@@ -128,8 +136,15 @@ Common::CVector3 Spherical2Cartesians(float azimuth, float elevation, float radi
 
 double d2r(double d);
 
-void TestGrid(std::string _filePath);
+int MenuTest();
 
-void TestOnlineInterpolation();
+void TestGridCreationMain(std::string _filePath);
+
+void TestGridInterpolationOffline_SOFAInterpolated(std::string _filePath);
+
+int TestOnlineInterpolation();
+
+void ChangeResamplingStep();
+
 
 #endif
