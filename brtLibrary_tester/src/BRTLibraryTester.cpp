@@ -26,6 +26,7 @@
 
 int iBufferSize;
 float resamplingStep = HRTFRESAMPLINGSTEP;
+bool doneTransverse = false, doneSagittal = false;
 int main()
 {
     //Input buffer size and reverb enable
@@ -133,6 +134,9 @@ void ResetOrientationSource()
 {
     source1Azimuth = SOURCE1_INITIAL_AZIMUTH;
     source1Elevation = SOURCE1_INITIAL_ELEVATION;
+    loopCounter = 0;
+    doneTransverse = false;
+    doneSagittal = false;
 }
 
 void LoadHRTF()
@@ -169,6 +173,7 @@ void ListenerSetup()
 
 int MenuTest()
 {
+    std::cout << std::endl << std::endl;
     std::cout << "           Choose which Test do you want to try now:" << std::endl;
     std::cout << "---------------------------------------------------------------------" << std::endl;
     std::cout << "0:  Test Creation of the Grid and write orientations to .csv file." << std::endl;
@@ -446,10 +451,12 @@ void MoveSource()
 {
     if (loopCounter < 2)
     {
+        if (!doneTransverse) { doneTransverse = true; std::cout << std::endl << "Currently doing Transverse Plane Trajectory\n"; doneSagittal = false; }
         MoveSource_CircularPathTransversePlane(loopCounter);
     }
     else
     {
+        if (!doneSagittal) { doneSagittal = true; std::cout << std::endl << "Currently doing Sagittal Plane Trajectory\n"; doneTransverse = false; }
         MoveSource_CircularPathSagittalPlane(loopCounter);
         if (loopCounter == 3) { loopCounter = 0; source1Elevation = SOURCE1_INITIAL_ELEVATION; }
     }
@@ -530,6 +537,7 @@ void TestGridCreationMain(std::string _filePath) {
     bool result = sofaReader.ReadHRTFFromSofaWithoutProcess(_filePath, hrtf, HRTFRESAMPLINGSTEP);
     if (result) {
 
+        std::cout << std::endl;
         std::cout << "Start Test Processing\n";
 
         // Call to the method Test Grid that prints to a .csv file the Grid created
@@ -546,6 +554,7 @@ void TestGridInterpolationOffline_SOFAInterpolated(std::string _filePath)
 
     if (result) {
 
+        std::cout << std::endl;
         std::cout << "Start Test Grid Interpolation Online Processing\n";
 
         // Call to the method Test Grid Interpolation that prints to console the number of HRIRs interpolated to check if a SOFA already interpolated needs to be interpolate. 
@@ -558,6 +567,7 @@ int TestOfflineInterpolation()
 {
     int answer;
     do {
+        std::cout << std::endl;
         std::cout << "Do you want to change the Resampling Step? Press 0." << std::endl;
         std::cout << "Press -1 to exit the test." << std::endl;
         std::cin >> answer;
@@ -586,6 +596,7 @@ int TestOnlineInterpolation()
     int answer;
     // Able to switch between Interpolation Online ON/OFF     
     do {
+        std::cout << std::endl;
         std::cout << "Choose which option do you want to do:  " << std::endl;
         std::cout << "0: Press 0 if you want to Disabled Online Interpolation." << std::endl;
         std::cout << "1: Press 1 if you want to Activate Online Interpolation." << std::endl;
@@ -637,4 +648,5 @@ void ChangeResamplingStep()
 
     LoadHRTF();
 
+    ResetOrientationSource();
 }
