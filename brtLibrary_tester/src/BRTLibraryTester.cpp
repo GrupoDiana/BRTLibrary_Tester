@@ -47,6 +47,14 @@ int main()
 
     LoadHRTF();
 
+    SourceSetup();
+
+    // Declaration and initialization of stereo buffer
+    outputBufferStereo.left.resize(iBufferSize);
+    outputBufferStereo.right.resize(iBufferSize);
+
+    AudioSetup();
+
     int modeOfTest;
     do
     {
@@ -67,15 +75,22 @@ int main()
 
             case 2:
             // Test Interpolation Offline -- Semi-Transparent HRTF
+                ResetOrientationSource();
+                listener->DisableInterpolation();
+                AudioSetupAndStart();
 
-                // Desactivar interpolation online y probar quizá tmbn diferentes resampling step.
+                int answer;
+                do {
+                    answer = TestOfflineInterpolation();
+                } while (answer != -1);
                 
+                // Stopping and closing the stream
+                audio->stopStream();
                 break;
 
             case 3:
             // Test Interpolation Online -- Semi-Transparent HRTF.
-
-                char answer;
+                ResetOrientationSource();
                 AudioSetupAndStart();
                 do {
                     answer = TestOnlineInterpolation();
@@ -83,7 +98,6 @@ int main()
 
                 // Stopping and closing the stream
                 audio->stopStream();
-                audio->closeStream();
                 break;
 
             default:
@@ -100,13 +114,6 @@ int main()
     //////////////////////////////
     // TEST ONLINE INTERPOLATION
     //////////////////////////////
-    //if (bTestGridInterpolation) { 
-    //    char answer;
-    //    do {
-    //        answer= TestOnlineInterpolation();
-    //    } while (answer != 'x');
-    //        
-    //}
 
     // Informing user by the console to press any key to end the execution
     std::cout << "Press ENTER to finish... \n";
@@ -116,10 +123,16 @@ int main()
 
     //// Stopping and closing the stream
     //audio->stopStream();
-    //audio->closeStream();
+    audio->closeStream();
 
 
     return 0;
+}
+
+void ResetOrientationSource()
+{
+    source1Azimuth = SOURCE1_INITIAL_AZIMUTH;
+    source1Elevation = SOURCE1_INITIAL_ELEVATION;
 }
 
 void LoadHRTF()
@@ -135,15 +148,6 @@ void LoadHRTF()
 
 void AudioSetupAndStart()
 {
-
-    SourceSetup();
-
-    // Declaration and initialization of stereo buffer
-    outputBufferStereo.left.resize(iBufferSize);
-    outputBufferStereo.right.resize(iBufferSize);
-
-    AudioSetup();
-
     // Starting the stream
     audio->startStream();
 }
@@ -542,11 +546,34 @@ void TestGridInterpolationOffline_SOFAInterpolated(std::string _filePath)
 
     if (result) {
 
-        std::cout << "Start Test Grid Interpolaiton Online Processing\n";
+        std::cout << "Start Test Grid Interpolation Online Processing\n";
 
         // Call to the method Test Grid Interpolation that prints to console the number of HRIRs interpolated to check if a SOFA already interpolated needs to be interpolate. 
         hrtfTester.TestGridInterpolation(hrtf);
     }
+
+}
+
+int TestOfflineInterpolation()
+{
+    int answer;
+    do {
+        std::cout << "Do you want to change the Resampling Step? Press 0." << std::endl;
+        std::cout << "Press -1 to exit the test." << std::endl;
+        std::cin >> answer;
+        std::cin.clear();
+        std::cin.ignore(INT_MAX, '\n');
+    } while (!(answer == 0 ||  answer == -1));
+
+    if (answer == 0)
+    {
+        audio->stopStream();
+
+        ChangeResamplingStep();
+
+        audio->startStream();
+    }
+    return answer;
 
 }
 
@@ -598,7 +625,7 @@ void ChangeResamplingStep()
     float _resamplingStep;
 
     do {
-        std::cout << "Enter the desired Resampling Step: ";
+        std::cout << "Enter the desired Resampling Step, currently set to " << resamplingStep << ": ";
 
         std::cin >> _resamplingStep;
         std::cin.clear();
