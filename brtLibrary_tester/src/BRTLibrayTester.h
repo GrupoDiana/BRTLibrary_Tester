@@ -124,24 +124,57 @@ void LoadWav(std::vector<float>& samplesVector, const char* stringIn);
 */
 static int rtAudioCallback(void *outputBuffer, void *inputBuffer, unsigned int bufferSize, double streamTime, RtAudioStreamStatus status, void *data);
 
+/**
+ * @brief Loads a SOFA File with certain resampling Step
+ * @param _filePath 
+ * @return 
+*/
 bool LoadSofaFile(std::string _filePath);
 
+/**
+ * @brief Loads ILD from SOFA
+ * @param _ildFilePath 
+ * @return 
+*/
 bool LoadILD(std::string _ildFilePath);
 
 void MoveSource();
 
+/**
+ * @brief Move the source in the transverse plane, with a circular trajectory
+ * @param loopCounter 
+*/
 void MoveSource_CircularPathTransversePlane(unsigned int& loopCounter);
 
+/**
+ * @brief Move the source in the Sagittal plane, with a circular trajectory
+ * @param loopCounter 
+*/
 void MoveSource_CircularPathSagittalPlane(unsigned int& loopCounter);
 
+/**
+ * @brief Convert spherical coordinates to Cartesians
+ * @param azimuth 
+ * @param elevation 
+ * @param radius 
+ * @return 
+*/
 Common::CVector3 Spherical2Cartesians(float azimuth, float elevation, float radius);
 
 double d2r(double d);
 
 int MenuTest();
 
+/**
+ * @brief Method that tests of the creation of the grid
+ * @param _filePath 
+*/
 void TestGridCreationMain(std::string _filePath);
 
+/**
+ * @brief Method that tests the (not) interpolation of a SOFA already interpolated
+ * @param _filePath 
+*/
 void TestGridInterpolationOffline_SOFAInterpolated(std::string _filePath);
 
 int TestOfflineInterpolation();
