@@ -404,7 +404,7 @@ bool LoadSofaFile(std::string _filePath) {
         std::cout<<"The sample rate in HRTF SOFA file." << std::endl;
         return false;
     }
-    bool result = sofaReader.ReadHRTFFromSofa(_filePath, hrtf, resamplingStep);
+    bool result = sofaReader.ReadHRTFFromSofa(_filePath, hrtf, resamplingStep, EXTRAPOLATION_METHOD);
     if (result) {
         std::cout << ("HRTF Sofa file loaded successfully.") << std::endl;
         HRTF_list.push_back(hrtf);
@@ -534,7 +534,7 @@ void TestGridCreationMain(std::string _filePath) {
     
     std::shared_ptr<BRTServices::CHRTF> hrtf = std::make_shared<BRTServices::CHRTF>();
 
-    bool result = sofaReader.ReadHRTFFromSofaWithoutProcess(_filePath, hrtf, HRTFRESAMPLINGSTEP);
+    bool result = sofaReader.ReadHRTFFromSofaWithoutProcess(_filePath, hrtf, HRTFRESAMPLINGSTEP, EXTRAPOLATION_METHOD);
     if (result) {
 
         std::cout << std::endl;
@@ -550,7 +550,7 @@ void TestGridInterpolationOffline_SOFAInterpolated(std::string _filePath)
 {
     std::shared_ptr<BRTServices::CHRTF> hrtf = std::make_shared<BRTServices::CHRTF>();
 
-    bool result = sofaReader.ReadHRTFFromSofaWithoutProcess(_filePath, hrtf, HRTFRESAMPLINGSTEP);
+    bool result = sofaReader.ReadHRTFFromSofaWithoutProcess(_filePath, hrtf, HRTFRESAMPLINGSTEP, EXTRAPOLATION_METHOD);
 
     if (result) {
 

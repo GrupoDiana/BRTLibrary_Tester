@@ -177,6 +177,21 @@
     <ClInclude Include="..\..\..\BRTLibrary\include\third_party_libraries\libmysofa\include\mysofa.h">
       <Filter>include\third_party_libraries\libmysofa\include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\Extrapolation.hpp">
+      <Filter>include\ServiceModules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\GridsManager.hpp">
+      <Filter>include\ServiceModules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\HRTFDefinitions.hpp">
+      <Filter>include\ServiceModules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\OfflineInterpolation.hpp">
+      <Filter>include\ServiceModules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\OnlineInterpolation.hpp">
+      <Filter>include\ServiceModules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\BRTLibrary\include\ServiceModules\HRTFTester.hpp">

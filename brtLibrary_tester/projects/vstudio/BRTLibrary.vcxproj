@@ -57,8 +57,13 @@
     <ClInclude Include="..\..\..\BRTLibrary\include\ProcessingModules\SRTFConvolver.hpp" />
     <ClInclude Include="..\..\..\BRTLibrary\include\Readers\LibMySofaLoader.hpp" />
     <ClInclude Include="..\..\..\BRTLibrary\include\Readers\SofaReader.hpp" />
+    <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\Extrapolation.hpp" />
+    <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\GridsManager.hpp" />
     <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\HRTF.hpp" />
+    <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\HRTFDefinitions.hpp" />
     <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\ILD.hpp" />
+    <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\OfflineInterpolation.hpp" />
+    <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\OnlineInterpolation.hpp" />
     <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\ServiceModuleInterfaces.hpp" />
     <ClInclude Include="..\..\..\BRTLibrary\include\ServiceModules\SRTF.hpp" />
     <ClInclude Include="..\..\..\BRTLibrary\include\SourceModels\SourceDirectivityModel.hpp" />
